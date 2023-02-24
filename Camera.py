@@ -1,5 +1,5 @@
 from pygame import Vector3, Vector2
-from math import radians, cos, sin
+from math import radians, cos, sin, pi
 import numpy as np
 
 class Camera:
@@ -16,9 +16,11 @@ class Camera:
 
     def project_perspective(self, point: Vector3):
 
+        fov = radians(self.fov)
+
         rx, ry, rz = radians(self.rotation.x), radians(self.rotation.y), radians(self.rotation.z)
 
-        e = Vector3(0, 0, 1) - self.position
+        e = Vector3(self.screenSize.x // 2, self.screenSize.y // 2, 1) - self.position
 
         point_matrix = np.matrix([
             [point.x],
