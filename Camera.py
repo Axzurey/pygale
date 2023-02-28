@@ -1,5 +1,5 @@
 from pygame import Vector3, Vector2
-from math import radians, cos, sin, pi
+from math import radians, cos, sin, tan
 import numpy as np
 
 class Camera:
@@ -16,11 +16,7 @@ class Camera:
 
     def project_perspective(self, point: Vector3):
 
-        fov = radians(self.fov)
-
         rx, ry, rz = radians(self.rotation.x), radians(self.rotation.y), radians(self.rotation.z)
-    
-        e = Vector3(0, 0, 1) - self.position
 
         a = np.matrix([
             [point.x],
@@ -53,13 +49,39 @@ class Camera:
         ])
 
         d = x_rotation_matrix * y_rotation_matrix * z_rotation_matrix * (a - c)
-        """
-        f = np.matrix([
-            [1, 0, e.x / e.z],
-            [0, 1, e.y / e.z],
-            [0, 0, 1 / e.z]
-        ]) * d
-        """
+
+        near = 1
+        far = 100
+
+        aspect = self.screenSize[0] / self.screenSize[1]
+
+        fov = radians(self.fov)
+
+        yScale = 1 / tan(fov / 2)
+        xScale = yScale / aspect
+
+        nearSubFar = near - far
+
+        fovMatrix = np.matrix([
+            [xScale, 0, 0, 0],
+            [0, yScale, 0, 0],
+            [0, 0, (far + near) / nearSubFar, -1],
+            [0, 0, 2 * far * near / nearSubFar, 0]
+        ])
+
+        #https://stackoverflow.com/questions/6060169/is-this-a-correct-perspective-fov-matrix
+
+        d = list(d.flat)
+
+        l = np.matrix([
+            [d[0]],
+            [d[1]],
+            [d[2]],
+            [1]
+        ])
+
+        d = fovMatrix * l
+        
         b = Vector2(d[0], d[1])
 
         #print(point, f, b, 'done')

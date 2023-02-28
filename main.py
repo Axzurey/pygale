@@ -49,7 +49,7 @@ cube = WorldObject([
     [2, 4, 6]
 ], camera)
 
-cube.position = Vector3(screenSize[0] // 2, screenSize[1] // 2, 0)
+cube.position = Vector3(screenSize[0] // 2, screenSize[1] // 2, 15)
 
 while True:
 
