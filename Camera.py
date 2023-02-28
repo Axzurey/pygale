@@ -19,16 +19,16 @@ class Camera:
         fov = radians(self.fov)
 
         rx, ry, rz = radians(self.rotation.x), radians(self.rotation.y), radians(self.rotation.z)
+    
+        e = Vector3(0, 0, 1) - self.position
 
-        e = Vector3(self.screenSize.x // 2, self.screenSize.y // 2, 1) - self.position
-
-        point_matrix = np.matrix([
+        a = np.matrix([
             [point.x],
             [point.y],
             [point.z]
         ])
 
-        position_matrix = np.matrix([
+        c = np.matrix([
             [self.position.x],
             [self.position.y],
             [self.position.z]
@@ -37,7 +37,7 @@ class Camera:
         x_rotation_matrix = np.matrix([
             [1, 0, 0],
             [0, cos(rx), sin(rx)],
-            [0, -sin(rx), cos(rz)]
+            [0, -sin(rx), cos(rx)]
         ]);
 
         y_rotation_matrix = np.matrix([
@@ -52,16 +52,16 @@ class Camera:
             [0, 0, 1]
         ])
 
-        d = x_rotation_matrix * y_rotation_matrix * z_rotation_matrix * (point_matrix - position_matrix)
-
-        f = list((np.matrix([
+        d = x_rotation_matrix * y_rotation_matrix * z_rotation_matrix * (a - c)
+        """
+        f = np.matrix([
             [1, 0, e.x / e.z],
             [0, 1, e.y / e.z],
             [0, 0, 1 / e.z]
-        ]) * d).flat) #type: ignore
+        ]) * d
+        """
+        b = Vector2(d[0], d[1])
 
-        b = Vector2(f[0] / f[2], f[1] / f[2])
-
-        #print(point, f, b)
+        #print(point, f, b, 'done')
 
         return b
